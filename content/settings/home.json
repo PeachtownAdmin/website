@@ -1,0 +1,146 @@
+{
+  "highlightsHeading": "Everyone builds it. Everyone is in it.",
+  "heroSecondaryHref": "/about/",
+  "facts": [
+    {
+      "figure": "Pre-K to 8",
+      "label": "One school, nine grades"
+    },
+    {
+      "figure": "6 to 1",
+      "label": "Students to every teacher"
+    },
+    {
+      "figure": "Since 1990",
+      "label": "In Aurora, New York"
+    }
+  ],
+  "heroHeading": "Twenty-five students. One very large curriculum.",
+  "highlightsEyebrow": "Life at Peachtown",
+  "quickLinks": [
+    {
+      "label": "Calendar",
+      "note": "Term dates and events",
+      "href": "/calendar/",
+      "icon": "calendar"
+    },
+    {
+      "label": "Forms",
+      "note": "Applications and health forms",
+      "href": "/forms/",
+      "icon": "form"
+    },
+    {
+      "label": "News",
+      "note": "Announcements from school",
+      "href": "/news/",
+      "icon": "megaphone"
+    },
+    {
+      "label": "Contact",
+      "note": "Reach the office",
+      "href": "/contact/",
+      "icon": "envelope"
+    }
+  ],
+  "heroPrimaryLabel": "Schedule a visit",
+  "heroEyebrow": "Aurora, New York",
+  "missionQuote": "A Peachtown education promotes personal responsibility and self-reliance, as well as a sense of family, tolerance and community. Children learn at a pace that challenges, but does not intimidate or bore.",
+  "heroPrimaryHref": "/admissions/",
+  "heroLede": "An independent day school for Pre-K through grade 8, where classes are small enough that everyone builds the trebuchet, and everyone gets a part in the play.",
+  "newsEyebrow": "From the school",
+  "highlightsLede": "Classes are small enough that no one sits out. Every student takes a part in the play, a turn at the workbench, and a sample from the lake.",
+  "heroSecondaryLabel": "About the school",
+  "heroSlides": [
+    {
+      "alt": "Peachtown students and teachers gathered on the shore of Cayuga Lake during an Earth Day clean-up.",
+      "image": {
+        "src": "/images/uploads/0000-00-00-hero-earth-day.webp",
+        "x": 50,
+        "y": 47
+      }
+    },
+    {
+      "alt": "Students in costume performing Shakespeare on stage under theater lighting.",
+      "image": {
+        "src": "/images/uploads/0000-00-00-hero-twelfth-night.webp",
+        "x": 50,
+        "y": 30
+      }
+    },
+    {
+      "alt": "Two students loading a wooden trebuchet they built in the field behind the school.",
+      "image": {
+        "src": "/images/uploads/0000-00-00-hero-trebuchet.webp",
+        "x": 50,
+        "y": 69
+      }
+    },
+    {
+      "alt": "Two students in costume performing a scene from The Princess Bride.",
+      "image": {
+        "src": "/images/uploads/0000-00-00-hero-princess-bride.webp",
+        "x": 50,
+        "y": 40
+      }
+    }
+  ],
+  "missionEyebrow": "What we are for",
+  "highlights": [
+    {
+      "alt": "Two students loading a wooden trebuchet they built, in the field behind the school.",
+      "tag": "Engineering",
+      "title": "Building a trebuchet",
+      "note": "Designed, built and fired in the field behind the school.",
+      "image": {
+        "src": "/images/uploads/0000-00-00-highlight-trebuchet.webp",
+        "x": 50,
+        "y": 50
+      }
+    },
+    {
+      "alt": "Students in costume performing Shakespeare on stage under theater lighting.",
+      "tag": "Drama",
+      "title": "Staging Shakespeare",
+      "note": "The whole school puts on a play each year, sets and costumes included.",
+      "image": {
+        "src": "/images/uploads/0000-00-00-highlight-shakespeare.webp",
+        "x": 50,
+        "y": 50
+      }
+    },
+    {
+      "alt": "A student lowering a sampling line into Cayuga Lake from the shore.",
+      "tag": "Field science",
+      "title": "Testing the lake",
+      "note": "Students sample and monitor the watershed the school sits above.",
+      "image": {
+        "src": "/images/uploads/0000-00-00-highlight-watershed.webp",
+        "x": 50,
+        "y": 50
+      }
+    },
+    {
+      "alt": "A hand-cut paper tessellation in red, blue and green forming a star.",
+      "tag": "Mathematics",
+      "title": "Tessellations by hand",
+      "note": "Geometry you can hold, cut and fitted until the plane closes.",
+      "image": {
+        "src": "/images/uploads/0000-00-00-highlight-tessellations.webp",
+        "x": 50,
+        "y": 50
+      }
+    },
+    {
+      "alt": "An open playscript densely annotated in several colors of highlighter.",
+      "tag": "Language arts",
+      "title": "A marked-up script",
+      "note": "Every part blocked and annotated by the student playing it.",
+      "image": {
+        "src": "/images/uploads/0000-00-00-highlight-script.webp",
+        "x": 50,
+        "y": 50
+      }
+    }
+  ]
+}

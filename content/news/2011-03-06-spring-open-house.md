@@ -1,0 +1,25 @@
+---
+title: "SPRING OPEN HOUSE"
+date: "2011-03-06"
+summary: "PEACHTOWN SPRING OPEN HOUSE SUNDAY, MARCH 13 2:00 PM TO 4:00 PM MEET THE TEACHERS TOUR THE SCHOOL OPEN TO ALL..."
+draft: false
+legacyUrl: "http://www.peachtownschool.com/2011/03/spring-open-house.html"
+---
+
+PEACHTOWN
+
+SPRING OPEN HOUSE
+
+SUNDAY, MARCH 13
+
+2:00 PM TO 4:00 PM
+
+  
+
+MEET THE TEACHERS
+
+TOUR THE SCHOOL
+
+  
+
+OPEN TO ALL
