@@ -6,10 +6,13 @@
   "scripts": {
     "dev": "node tools/sync-cms-bundle.mjs && astro dev",
     "cms": "decap-server",
-    "build": "node tools/sync-cms-bundle.mjs && astro build",
+    "build": "node tools/sync-cms-bundle.mjs && node tools/optimize-uploads.mjs && astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "sync-cms": "node tools/sync-cms-bundle.mjs"
+    "sync-cms": "node tools/sync-cms-bundle.mjs",
+    "logo": "node tools/build-logo.mjs",
+    "fonts": "node tools/fetch-fonts.mjs",
+    "optimize": "node tools/optimize-uploads.mjs"
   },
   "dependencies": {
     "astro": "^5.18.2"

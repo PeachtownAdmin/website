@@ -20,7 +20,7 @@ collections:
     label: School information
     description: Details that appear across the whole website.
     editor:
-      preview: false
+      preview: true
     files:
       - name: site
         label: School details
@@ -84,6 +84,81 @@ collections:
               hint: Leave this alone unless PayPal is reconfigured.,
             }
 
+      - name: home
+        label: Home page
+        file: content/settings/home.json
+        fields:
+          - name: heroSlides
+            label: Photos at the top of the home page
+            widget: list
+            label_singular: photo
+            summary: "{{fields.alt}}"
+            hint: These fade from one to the next. Two to five works best.
+            fields:
+              - { name: image, label: Photo, widget: imagefocus, ratio: "5/2" }
+              - {
+                  name: alt,
+                  label: Photo description,
+                  widget: string,
+                  hint: Describe the photo for visitors who cannot see it.,
+                }
+          - { name: heroEyebrow, label: Small line above the headline, widget: string, required: false }
+          - { name: heroHeading, label: Headline, widget: text }
+          - { name: heroLede, label: Sentence under the headline, widget: text, required: false }
+          - { name: highlightsEyebrow, label: "Highlights: small heading", widget: string, required: false }
+          - { name: highlightsHeading, label: "Highlights: heading", widget: string }
+          - { name: highlightsLede, label: "Highlights: intro sentence", widget: text, required: false }
+          - name: highlights
+            label: "Highlights: the cards"
+            widget: list
+            label_singular: highlight
+            summary: "{{fields.title}}"
+            fields:
+              - { name: image, label: Photo, widget: imagefocus, ratio: "4/3" }
+              - { name: alt, label: Photo description, widget: string }
+              - {
+                  name: tag,
+                  label: Subject,
+                  widget: string,
+                  hint: "Shown in small capitals above the title, for example Drama.",
+                }
+              - { name: title, label: Title, widget: string }
+              - { name: note, label: One sentence about it, widget: text }
+          - { name: heroPrimaryLabel, label: "Hero: main button text", widget: string }
+          - { name: heroPrimaryHref, label: "Hero: main button link", widget: string }
+          - { name: heroSecondaryLabel, label: "Hero: second button text", widget: string, required: false }
+          - { name: heroSecondaryHref, label: "Hero: second button link", widget: string, required: false }
+          - name: quickLinks
+            label: Quick links bar
+            widget: list
+            label_singular: link
+            summary: "{{fields.label}}"
+            hint: The row of shortcuts under the photos, for families who already attend.
+            fields:
+              - { name: label, label: Label, widget: string }
+              - { name: note, label: Small text underneath, widget: string, required: false }
+              - { name: href, label: Link, widget: string, hint: "For example /calendar/" }
+              - name: icon
+                label: Icon
+                widget: select
+                default: calendar
+                options:
+                  - { label: Calendar, value: calendar }
+                  - { label: Document, value: form }
+                  - { label: Megaphone, value: megaphone }
+                  - { label: Envelope, value: envelope }
+          - name: facts
+            label: Three facts
+            widget: list
+            label_singular: fact
+            summary: "{{fields.figure}}"
+            fields:
+              - { name: figure, label: The big text, widget: string }
+              - { name: label, label: The small text under it, widget: string }
+          - { name: newsEyebrow, label: "News: small heading", widget: string }
+          - { name: missionEyebrow, label: "Mission: small heading", widget: string, required: false }
+          - { name: missionQuote, label: "Mission: the quote", widget: text }
+
   - name: pages
     label: Pages
     editor:
@@ -112,12 +187,15 @@ collections:
           required: false,
           hint: One or two sentences shown in Google results.,
         }
-      - {
-          name: showInNav,
-          label: Show this page in the menu bar,
-          widget: boolean,
-          default: false,
-        }
+      - name: navGroup
+        label: Where this page appears in the menus
+        widget: select
+        default: none
+        options:
+          - { label: Not in any menu, value: none }
+          - { label: Main menu, value: main }
+          - { label: Small links bar at the very top, value: utility }
+        hint: The small top bar is for things current families need often, like the calendar.
       - {
           name: order,
           label: Menu position,
@@ -159,7 +237,10 @@ collections:
     extension: md
     format: frontmatter
     identifier_field: title
-    sortable_fields: [date, title]
+    # default_sort desc puts the newest announcement at the top of the list.
+    sortable_fields:
+      - { field: date, label: Date, default_sort: desc }
+      - { field: title, label: Headline }
     view_filters:
       - { label: Published, field: draft, pattern: false }
       - { label: Drafts, field: draft, pattern: true }
@@ -205,9 +286,20 @@ collections:
     extension: md
     format: frontmatter
     identifier_field: name
+    sortable_fields:
+      - { field: order, label: Position, default_sort: asc }
+      - { field: name, label: Name }
     fields:
       - { name: name, label: Name, widget: string }
       - { name: role, label: Role or job title, widget: string }
+      - {
+          name: credentials,
+          label: Degrees and qualifications,
+          widget: string,
+          required: false,
+          hint: Shown in italics under the name.,
+        }
+      - { name: email, label: Email address, widget: string, required: false }
       - { name: photo, label: Photo, widget: image, required: false, choose_url: false }
       - {
           name: photoAlt,

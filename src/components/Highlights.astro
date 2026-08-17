@@ -1,0 +1,157 @@
+---
+// Labelled cards showing what students actually do. The label carries the
+// subject rather than a year: a date would quietly advertise how old the
+// photograph is, and the subject is what a prospective parent is scanning for.
+
+interface Highlight {
+  image: { src: string; x: number; y: number };
+  alt: string;
+  tag: string;
+  title: string;
+  note: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  lede?: string;
+  items: Highlight[];
+}
+
+const { eyebrow, heading, lede, items } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <section class="section highlights">
+      <div class="wrap intro">
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+        <h2>{heading}</h2>
+        {lede && <p class="lede">{lede}</p>}
+      </div>
+
+      <ul class="cards" role="list">
+        {items.map((item, i) => (
+          <li class="card">
+            <figure>
+              <img
+                src={item.image.src}
+                alt={item.alt}
+                loading={i < 2 ? "eager" : "lazy"}
+                decoding="async"
+                style={`object-position: ${item.image.x}% ${item.image.y}%`}
+              />
+              <figcaption>
+                <span class="card-tag">{item.tag}</span>
+                <span class="card-title">{item.title}</span>
+                <span class="card-note">{item.note}</span>
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .highlights {
+    background: var(--paper-dim);
+  }
+
+  .lede {
+    max-width: var(--measure);
+    color: var(--text-muted);
+    font-size: var(--step-1);
+    margin-bottom: 0;
+  }
+
+  /* Phones scroll sideways with snap points. The trailing spacer stops the
+     last card butting against the edge, which read as a clipped layout. */
+  .cards {
+    list-style: none;
+    margin: var(--space-md) 0 0;
+    padding: 0 0 var(--space-xs);
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min(74%, 19rem);
+    align-items: start;
+    gap: var(--space-sm);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: var(--gutter);
+    padding-inline: var(--gutter);
+    /* Without this the last card scrolls almost off screen, because the
+       track keeps the full gutter as trailing space. */
+    scroll-snap-stop: always;
+    scrollbar-width: thin;
+    --gutter: max(1.25rem, calc((100% - var(--wrap)) / 2));
+  }
+
+  .card {
+    scroll-snap-align: start;
+  }
+
+  figure {
+    margin: 0;
+    background: var(--paper);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: var(--ink-soft);
+  }
+
+  figcaption {
+    display: grid;
+    gap: 0.2rem;
+    padding: var(--space-xs) var(--space-xs) var(--space-sm);
+    border-top: 3px solid var(--amber);
+  }
+
+  .card-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  .card-note {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    text-wrap: pretty;
+  }
+
+  @media (min-width: 40em) {
+    .cards {
+      grid-auto-columns: min(46%, 20rem);
+    }
+  }
+
+  @media (min-width: 64em) {
+    .cards {
+      grid-auto-flow: row;
+      grid-auto-columns: auto;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--space-md);
+      overflow-x: visible;
+      width: min(100% - 2.5rem, var(--wrap));
+      margin-inline: auto;
+      padding-inline: 0;
+    }
+  }
+</style>

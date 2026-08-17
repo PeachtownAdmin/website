@@ -68,7 +68,7 @@ function collectImages(html) {
 function rewriteImages(md) {
   return md.replace(/!\[([^\]]*)\]\(([^)\s]+)[^)]*\)/g, (whole, alt, url) => {
     const hit = images.get(url);
-    return hit ? `![${alt}](/images/legacy/${hit.file})` : whole;
+    return hit ? `![${alt}](/images/uploads/${hit.file})` : whole;
   });
 }
 
@@ -92,10 +92,17 @@ function convert(entry, kind, index) {
 
   let md = td.turndown(html);
   md = rewriteImages(md);
-  // Blogger bodies are <br> soup, which turndown renders as trailing hard breaks.
+  // Blogger used <br> for line breaks inside addresses and schedules, which
+  // turndown renders as two trailing spaces. Those are kept, because removing
+  // them collapses addresses onto one line.
   md = md
     .replace(/\u00a0/g, " ")
-    .replace(/[ \t]+$/gm, "")
+    // Adjacent <b> runs become **a****b**, which is broken markdown and
+    // renders the asterisks literally. Merge them into one emphasis run.
+    .replace(/\*\*\*\*/g, "")
+    .replace(/____/g, "")
+    // The same split with whitespace between the runs: **a** **b**.
+    .replace(/\*\*([ \t]+)\*\*/g, "$1")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 

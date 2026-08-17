@@ -2,6 +2,7 @@
 import { getCollection, render } from "astro:content";
 import type { GetStaticPaths } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/PageHeader.astro";
 
 export const getStaticPaths = (async () => {
   const posts = await getCollection("news", (p) => !p.data.draft);
@@ -10,29 +11,41 @@ export const getStaticPaths = (async () => {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+
+const date = post.data.date.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
 ---
 
 <BaseLayout title={post.data.title} description={post.data.summary}>
-  <article>
-    <h1>{post.data.title}</h1>
-    <time datetime={post.data.date.toISOString()}>
-      {post.data.date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })}
-    </time>
-    <div class="prose">
+  <div class="page">
+    <PageHeader solo title={post.data.title} eyebrow={date} description={post.data.summary} />
+
+    <div class="wrap page-body is-solo">
+    <article class="prose prose-article">
       <Content />
+    </article>
+
+      <p class="back">
+        <a href="/news/">All news and announcements</a>
+      </p>
     </div>
-    <p><a href="/news/">Back to all news</a></p>
-  </article>
+  </div>
 </BaseLayout>
 
 <style>
-  time {
-    display: block;
-    color: var(--color-text-muted);
-    margin-bottom: var(--space-md);
+  .back {
+    margin-top: var(--space-lg);
+    padding-top: var(--space-sm);
+    border-top: var(--border);
+    max-width: var(--measure);
+  }
+
+  .back a {
+    text-decoration-color: var(--amber);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.22em;
   }
 </style>

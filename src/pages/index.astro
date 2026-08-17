@@ -1,62 +1,237 @@
 ---
-import { getEntry, getCollection, render } from "astro:content";
+import { getEntry, getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import LatestNote from "../components/LatestNote.astro";
+import QuickLinks from "../components/QuickLinks.astro";
+import Highlights from "../components/Highlights.astro";
+import Icon from "../components/Icon.astro";
 
 const site = (await getEntry("settings", "site"))!.data;
-const home = await getEntry("pages", "home");
-const { Content } = home ? await render(home) : { Content: null };
+const home = (await getEntry("homepage", "home"))!.data;
 
-const recent = (await getCollection("news", (p) => !p.data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 2);
+const published = (await getCollection("news", (p) => !p.data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const latest = published[0];
+const recent = published.slice(0, 3);
+
 ---
 
 <BaseLayout title={site.schoolName} description={site.tagline}>
-  <h1>{site.schoolName}</h1>
-  {site.tagline && <p class="tagline">{site.tagline}</p>}
+  <Hero
+    eyebrow={home.heroEyebrow}
+    heading={home.heroHeading}
+    lede={home.heroLede}
+    slides={home.heroSlides}
+    primaryLabel={home.heroPrimaryLabel}
+    primaryHref={home.heroPrimaryHref}
+    secondaryLabel={home.heroSecondaryLabel}
+    secondaryHref={home.heroSecondaryHref}
+  />
 
-  <div class="prose">
-    {Content ? <Content /> : <p>Home page content has not been written yet.</p>}
-  </div>
+  <LatestNote post={latest} />
+  <QuickLinks links={home.quickLinks} />
+
+  {
+    home.facts.length > 0 && (
+      <section class="section facts">
+        <div class="wrap">
+          <ul role="list">
+            {home.facts.map((fact) => (
+              <li>
+                <span class="fact-figure">{fact.figure}</span>
+                <span class="fact-label">{fact.label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <Highlights
+    eyebrow={home.highlightsEyebrow}
+    heading={home.highlightsHeading}
+    lede={home.highlightsLede}
+    items={home.highlights}
+  />
+
+  <section class="section mission on-ink">
+    <div class="wrap mission-inner">
+      <div>
+        {home.missionEyebrow && <p class="eyebrow">{home.missionEyebrow}</p>}
+        <blockquote><p>{home.missionQuote}</p></blockquote>
+        <p class="mission-more">
+          <a href="/about/">More about how the school works <Icon name="arrow" size={16} /></a>
+        </p>
+      </div>
+    </div>
+  </section>
 
   {
     recent.length > 0 && (
-      <section>
-        <h2>Latest news</h2>
-        <ul class="news-list">
-          {recent.map((post) => (
-            <li>
-              <a href={`/news/${post.id}/`}>{post.data.title}</a>
-              <time datetime={post.data.date.toISOString()}>
-                {post.data.date.toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </time>
-            </li>
-          ))}
-        </ul>
+      <section class="section news">
+        <div class="wrap">
+          <div class="news-head">
+            <p class="eyebrow">{home.newsEyebrow}</p>
+            <a class="news-all" href="/news/">
+              All news <Icon name="arrow" size={16} />
+            </a>
+          </div>
+          <ul role="list" class="news-list">
+            {recent.map((post) => (
+              <li>
+                <time datetime={post.data.date.toISOString()}>
+                  {post.data.date.toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </time>
+                <h3>
+                  <a href={`/news/${post.id}/`}>{post.data.title}</a>
+                </h3>
+                {post.data.summary && <p>{post.data.summary}</p>}
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
     )
   }
 </BaseLayout>
 
 <style>
-  .tagline {
-    font-size: var(--step-1);
-    color: var(--color-text-muted);
-    max-width: var(--measure);
+  /* Tighter than a normal section. The three facts are a compact band between
+     the quick links and the highlights, and the generous section padding was
+     pushing them past the fold on a laptop. */
+  .facts {
+    background: var(--paper);
+    padding-block: var(--space-md);
+  }
+
+  .facts ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1px;
+    background: var(--paper-dim);
+    border: 1px solid var(--paper-dim);
+  }
+
+  @media (min-width: 40em) {
+    .facts ul {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .facts li {
+    display: grid;
+    gap: 0.2rem;
+    background: var(--paper);
+    padding: var(--space-md) var(--space-sm);
+    text-align: center;
+  }
+
+  .facts li::before {
+    content: "";
+    width: 2.5rem;
+    height: 3px;
+    background: var(--amber);
+    margin: 0 auto var(--space-xs);
+  }
+
+  .fact-figure {
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    font-weight: 600;
+    line-height: 1.05;
+  }
+
+  .fact-label {
+    color: var(--text-muted);
+  }
+
+  blockquote {
+    margin: 0;
+    max-width: 50ch;
+  }
+
+  blockquote p {
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    line-height: 1.35;
+    text-wrap: pretty;
+    margin: 0;
+  }
+
+  .mission-more {
+    margin: var(--space-md) 0 0;
+  }
+
+  .mission-more a,
+  .news-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration-color: var(--amber);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.22em;
+  }
+
+  .news-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-xs);
+  }
+
+  .news-all {
+    font-weight: 700;
+    font-size: var(--step--1);
   }
 
   .news-list {
     list-style: none;
+    margin: var(--space-sm) 0 0;
     padding: 0;
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  @media (min-width: 48em) {
+    .news-list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .news-list li {
+    border-top: 2px solid var(--paper-dim);
+    padding-top: var(--space-xs);
+  }
+
+  .news-list h3 {
+    font-size: var(--step-1);
+    margin: 0.1rem 0 var(--space-2xs);
+  }
+
+  .news-list h3 a {
+    text-decoration-color: var(--amber);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
   }
 
   .news-list time {
-    display: block;
-    color: var(--color-text-muted);
-    font-size: 0.9em;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+
+  .news-list p {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: var(--step-0);
   }
 </style>

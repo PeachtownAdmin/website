@@ -1,5 +1,6 @@
 ---
 import { getEntry } from "astro:content";
+import "../styles/fonts.css";
 import "../styles/tokens.css";
 import "../styles/base.css";
 import SiteHeader from "../components/SiteHeader.astro";
@@ -24,19 +25,20 @@ const isProduction = __IS_PRODUCTION__;
     <title>{fullTitle}</title>
     {description && <meta name="description" content={description} />}
     {!isProduction && <meta name="robots" content="noindex, nofollow" />}
-    <link rel="icon" href="/favicon.png" type="image/png" />
+    <meta name="theme-color" content="#0b2116" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="/favicon.png" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:title" content={fullTitle} />
     {description && <meta property="og:description" content={description} />}
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.schoolName} />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
     <SiteHeader />
     <main id="main">
-      <div class="wrap">
-        <slot />
-      </div>
+      <slot />
     </main>
     <SiteFooter />
   </body>

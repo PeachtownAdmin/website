@@ -1,38 +1,54 @@
 /*
-  Design tokens. The visual direction is not decided yet, so these are
-  deliberately plain. Changing the look means changing values here, not
-  hunting through components.
+  Design tokens. Change the look here, not in components.
+  Rationale lives in docs/design-direction.md.
 */
 
 :root {
-  /* Sampled from the school logo. */
-  --color-brand: #0b2116;
-  --color-brand-soft: #78867e;
+  /* Greens are the logo color and its lifts. The site leads with deep green
+     surfaces rather than the white most school sites use. */
+  --ink: #0b2116;
+  --ink-soft: #1b3a28;
+  --ink-line: #2e5540;
 
-  /* Placeholder accent. Muted terracotta, pending sign-off. */
-  --color-accent: #a85f3f;
-  --color-accent-contrast: #ffffff;
+  /* Warm paper for reading surfaces. */
+  --paper: #f5f1e6;
+  --paper-dim: #e8e2d2;
 
-  --color-text: #1c1c1a;
-  --color-text-muted: #5a6560;
-  --color-bg: #fdfcf9;
-  --color-surface: #f3f0e9;
-  --color-border: #ddd8cc;
+  /* Amber carries calls to action. It fails contrast as text on paper, so it
+     is only ever a fill on paper, or text on green. */
+  --amber: #c8791f;
+  --amber-light: #e8a24a;
 
-  --font-heading: Georgia, "Times New Roman", serif;
-  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --text: #14231a;
+  --text-muted: #55605a;
+  --text-on-ink: #f5f1e6;
+  --text-on-ink-muted: #b6c4ba;
 
+  --font-display: "Lora", Georgia, "Times New Roman", serif;
+  --font-body: "Atkinson Hyperlegible", system-ui, -apple-system, sans-serif;
+
+  /* Fluid type. Body never drops below 17px; the audience includes
+     grandparents. */
+  --step--1: 0.875rem;
   --step-0: 1.0625rem;
-  --step-1: 1.25rem;
-  --step-2: 1.5rem;
-  --step-3: 2rem;
-  --step-4: 2.75rem;
+  --step-1: clamp(1.15rem, 1.08rem + 0.35vw, 1.35rem);
+  --step-2: clamp(1.35rem, 1.18rem + 0.85vw, 1.8rem);
+  --step-3: clamp(1.7rem, 1.35rem + 1.75vw, 2.5rem);
+  --step-4: clamp(2.1rem, 1.5rem + 3vw, 3.75rem);
 
-  --space-xs: 0.5rem;
+  --space-2xs: 0.375rem;
+  --space-xs: 0.625rem;
   --space-sm: 1rem;
-  --space-md: 2rem;
-  --space-lg: 4rem;
+  --space-md: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
+  --space-lg: clamp(2.5rem, 1.9rem + 3vw, 3.5rem);
+  --space-xl: clamp(3.5rem, 2.2rem + 6vw, 5.5rem);
 
-  --measure: 68ch;
-  --radius: 4px;
+  --measure: 62ch;
+  /* One container width for the whole site. Header, footer, page titles and
+     body all share it, so everything lines up on the same left edge. */
+  --wrap: 82rem;
+  --radius: 2px;
+
+  --border: 1px solid var(--paper-dim);
+  --border-on-ink: 1px solid var(--ink-line);
 }

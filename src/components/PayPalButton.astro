@@ -1,0 +1,42 @@
+---
+// PayPal hosted buttons carried over from the old site. The button IDs live in
+// the school's PayPal account and are editable in the CMS. Rendered as a real
+// form rather than the old image button, so it is keyboard accessible and
+// matches the rest of the site.
+
+interface Props {
+  buttonId: string;
+  label: string;
+  note?: string;
+}
+
+const { buttonId, label, note } = Astro.props;
+---
+
+{
+  buttonId && (
+    <form class="paypal" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+      <input type="hidden" name="cmd" value="_s-xclick" />
+      <input type="hidden" name="hosted_button_id" value={buttonId} />
+      <button class="button" type="submit">{label}</button>
+      {note && <p class="paypal-note">{note}</p>}
+    </form>
+  )
+}
+
+<style>
+  .paypal {
+    margin-block: var(--space-sm);
+  }
+
+  .paypal button {
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .paypal-note {
+    margin: var(--space-2xs) 0 0;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+</style>

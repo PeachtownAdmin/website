@@ -1,0 +1,32 @@
+---
+// Inlined rather than an <img> so the traced paths inherit currentColor and
+// stay visible on both the green header and the paper background.
+import mark from "../assets/logo/logo-mark.svg?raw";
+import lockup from "../assets/logo/logo-lockup.svg?raw";
+
+interface Props {
+  variant?: "mark" | "lockup";
+  width: number;
+  class?: string;
+}
+
+const { variant = "mark", width, class: className } = Astro.props;
+const ratio = variant === "mark" ? 612 / 805 : 863 / 965;
+const svg = (variant === "mark" ? mark : lockup).replace(
+  "<svg",
+  `<svg role="presentation" focusable="false" style="width:${width}px;height:${Math.round(width * ratio)}px"`
+);
+---
+
+<span class:list={["logo", className]} set:html={svg} />
+
+<style>
+  .logo {
+    display: inline-flex;
+    flex: none;
+  }
+
+  .logo :global(svg) {
+    display: block;
+  }
+</style>

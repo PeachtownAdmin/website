@@ -1,0 +1,96 @@
+---
+import { getCollection } from "astro:content";
+
+// Sidebar listing the other pages in this section, the way a college site
+// does. It is also how the subject pages become reachable at all: they are
+// linked from Academics prose, but that is not navigation.
+
+interface Props {
+  current: string;
+  parent?: string;
+}
+
+const { current, parent } = Astro.props;
+
+const pages = await getCollection("pages", (p) => !p.data.draft);
+const byId = new Map(pages.map((p) => [p.id, p]));
+
+// A page shows its own children if it has any, otherwise its siblings.
+const children = pages.filter((p) => p.data.parent === current);
+const sectionId = children.length > 0 ? current : parent;
+const section = sectionId ? byId.get(sectionId) : undefined;
+
+const items = sectionId
+  ? pages
+      .filter((p) => p.data.parent === sectionId)
+      .sort((a, b) => a.data.order - b.data.order)
+      .map((p) => ({ href: `/${p.id}/`, label: p.data.navLabel ?? p.data.title, id: p.id }))
+  : [];
+---
+
+{
+  items.length > 0 && section && (
+    <nav class="section-nav" aria-label={`${section.data.title} section`}>
+      <a class="section-root" href={`/${section.id}/`} aria-current={current === section.id ? "page" : undefined}>
+        {section.data.navLabel ?? section.data.title}
+      </a>
+      <ul>
+        {items.map((item) => (
+          <li>
+            <a href={item.href} aria-current={item.id === current ? "page" : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  .section-nav {
+    margin-bottom: var(--space-md);
+  }
+
+  .section-root {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 600;
+    text-decoration: none;
+    padding-bottom: var(--space-2xs);
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: var(--space-xs);
+  }
+
+  .section-root[aria-current="page"] {
+    color: var(--amber);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+  }
+
+  li a {
+    display: block;
+    padding: 0.4rem var(--space-xs);
+    font-size: var(--step-0);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    border-bottom: 1px solid var(--paper-dim);
+  }
+
+  li a:hover {
+    background: var(--paper-dim);
+    border-left-color: var(--amber);
+  }
+
+  li a[aria-current="page"] {
+    border-left-color: var(--amber);
+    background: var(--paper-dim);
+    font-weight: 600;
+  }
+</style>

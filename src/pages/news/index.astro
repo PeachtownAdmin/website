@@ -1,55 +1,82 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/PageHeader.astro";
 
 const posts = (await getCollection("news", (p) => !p.data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
 ---
 
-<BaseLayout title="News" description="News and announcements from Peachtown Elementary School.">
-  <h1>News</h1>
+<BaseLayout
+  title="News"
+  description="News and announcements from Peachtown Elementary School."
+>
+  <div class="page">
+    <PageHeader
+      title="News"
+      description="Announcements, performances and what students have been working on."
+    />
 
-  {posts.length === 0 && <p>There are no published announcements yet.</p>}
+    <div class="wrap page-body is-solo">
+    {posts.length === 0 && <p class="prose">There are no announcements yet.</p>}
 
-  <ul class="news-list">
-    {
-      posts.map((post) => (
-        <li>
-          <h2><a href={`/news/${post.id}/`}>{post.data.title}</a></h2>
-          <time datetime={post.data.date.toISOString()}>
-            {post.data.date.toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </time>
-          {post.data.summary && <p>{post.data.summary}</p>}
-        </li>
-      ))
-    }
-  </ul>
+    <ul class="news-list" role="list">
+      {
+        posts.map((post) => (
+          <li>
+            <time datetime={post.data.date.toISOString()}>
+              {post.data.date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </time>
+            <h2>
+              <a href={`/news/${post.id}/`}>{post.data.title}</a>
+            </h2>
+            {post.data.summary && <p>{post.data.summary}</p>}
+          </li>
+        ))
+      }
+      </ul>
+    </div>
+  </div>
 </BaseLayout>
 
 <style>
   .news-list {
     list-style: none;
+    margin: 0;
     padding: 0;
     max-width: var(--measure);
+    display: grid;
+    gap: var(--space-md);
   }
 
   .news-list li {
-    padding-block: var(--space-sm);
-    border-bottom: 1px solid var(--color-border);
+    border-top: 2px solid var(--paper-dim);
+    padding-top: var(--space-xs);
   }
 
   .news-list h2 {
     font-size: var(--step-2);
-    margin-bottom: 0;
+    margin: 0.1rem 0 var(--space-2xs);
+  }
+
+  .news-list h2 a {
+    text-decoration-color: var(--amber);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
   }
 
   time {
-    color: var(--color-text-muted);
-    font-size: 0.9em;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+
+  .news-list p {
+    color: var(--text-muted);
+    margin: 0;
   }
 </style>

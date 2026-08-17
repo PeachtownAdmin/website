@@ -1,51 +1,403 @@
 ---
 import { getEntry, getCollection } from "astro:content";
+import Logo from "./Logo.astro";
 
 const site = (await getEntry("settings", "site"))!.data;
+const path = Astro.url.pathname;
 
-// Nav is driven by page frontmatter, so editors control order and labels
-// without touching templates.
-const navPages = (await getCollection("pages", (p) => p.data.showInNav && !p.data.draft)).sort(
-  (a, b) => a.data.order - b.data.order
-);
+const pages = await getCollection("pages", (p) => !p.data.draft);
+const inGroup = (group: string) =>
+  pages
+    .filter((p) => p.data.navGroup === group)
+    .sort((a, b) => a.data.order - b.data.order)
+    .map((p) => ({ href: `/${p.id}/`, label: p.data.navLabel ?? p.data.title }));
+
+// News is a route rather than an editable page, so it is appended by hand.
+const utility = [...inGroup("utility"), { href: "/news/", label: "News" }];
+
+// Top level items carry their children, so the subject pages are reachable
+// from the menu rather than only from links inside prose.
+const main = inGroup("main").map((item) => {
+  const id = item.href.replace(/\//g, "");
+  return {
+    ...item,
+    children: pages
+      .filter((p) => p.data.parent === id)
+      .sort((a, b) => a.data.order - b.data.order)
+      .map((p) => ({ href: `/${p.id}/`, label: p.data.navLabel ?? p.data.title })),
+  };
+});
+
+const current = (href: string) => path === href || (href !== "/" && path.startsWith(href));
 ---
+
+<div class="utility">
+  <nav class="wrap utility-inner" aria-label="For current families">
+    <span class="utility-tag" aria-hidden="true">For families</span>
+    <ul>
+      {
+        utility.map((item) => (
+          <li>
+            <a href={item.href} aria-current={current(item.href) ? "page" : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</div>
 
 <header class="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="/">
-      <img src="/images/logo-mark.png" alt="" width="60" height="40" />
-      <span>{site.shortName}</span>
+      <Logo variant="mark" width={44} />
+      <span class="brand-text">
+        <span class="brand-name">{site.shortName}</span>
+        <span class="brand-sub">Elementary School</span>
+      </span>
     </a>
-    <nav aria-label="Main">
+
+    <nav class="main-nav" aria-label="Main">
       <ul>
         {
-          navPages.map((page) => (
-            <li>
-              <a href={`/${page.id}/`}>{page.data.navLabel ?? page.data.title}</a>
-            </li>
-          ))
+          main.map((item) =>
+            item.children.length === 0 ? (
+              <li>
+                <a href={item.href} aria-current={current(item.href) ? "page" : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ) : (
+              <li class="has-menu" data-menu>
+                <a href={item.href} aria-current={current(item.href) ? "page" : undefined}>
+                  {item.label}
+                </a>
+                <button type="button" class="menu-toggle" aria-expanded="false" data-menu-button>
+                  <span class="visually-hidden">{`Show pages under ${item.label}`}</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path
+                      d="m6 9 6 6 6-6"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </button>
+                <ul class="submenu" data-menu-list>
+                  {item.children.map((child) => (
+                    <li>
+                      <a href={child.href} aria-current={current(child.href) ? "page" : undefined}>
+                        {child.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            )
+          )
         }
-        <li><a href="/news/">News</a></li>
       </ul>
     </nav>
+
+    <a class="button header-cta" href="/admissions/">Schedule a visit</a>
   </div>
 </header>
 
+<script>
+  // Click to open, not hover. Hover menus are a coin flip on touch screens and
+  // fiddly for anyone with an unsteady hand, and the audience here is older.
+  const menus = Array.from(document.querySelectorAll<HTMLElement>("[data-menu]"));
+
+  const closeAll = (except?: HTMLElement) => {
+    for (const menu of menus) {
+      if (menu === except) continue;
+      menu.classList.remove("is-open");
+      menu.querySelector("[data-menu-button]")?.setAttribute("aria-expanded", "false");
+    }
+  };
+
+  for (const menu of menus) {
+    const button = menu.querySelector<HTMLButtonElement>("[data-menu-button]");
+    button?.addEventListener("click", () => {
+      const open = menu.classList.toggle("is-open");
+      button.setAttribute("aria-expanded", open ? "true" : "false");
+      closeAll(menu);
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    const target = event.target as Node;
+    if (!menus.some((menu) => menu.contains(target))) closeAll();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeAll();
+  });
+
+  // Keyboard users tabbing out of a menu should close it behind them.
+  for (const menu of menus) {
+    menu.addEventListener("focusout", () => {
+      window.setTimeout(() => {
+        if (!menu.contains(document.activeElement)) {
+          menu.classList.remove("is-open");
+          menu.querySelector("[data-menu-button]")?.setAttribute("aria-expanded", "false");
+        }
+      }, 0);
+    });
+  }
+</script>
+
 <style>
+  /* No hamburger anywhere. The menu is short enough to wrap, and an icon
+     button is one more thing for an older visitor to decode. */
+
+  .utility {
+    background: var(--ink);
+    color: var(--text-on-ink-muted);
+    font-size: var(--step--1);
+    border-bottom: var(--border-on-ink);
+  }
+
+  .utility-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0 var(--space-sm);
+    padding-block: 0.35rem;
+  }
+
+  /* The tag stays left and the links sit right, so neither end of the bar is
+     empty on a wide screen. */
+  .utility-tag {
+    margin-right: auto;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    color: var(--text-on-ink-muted);
+    opacity: 0.75;
+  }
+
+  .utility ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-sm);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .utility a {
+    display: inline-block;
+    color: var(--text-on-ink-muted);
+    text-decoration: none;
+    padding-block: 0.25rem;
+  }
+
+  .utility a:hover,
+  .utility a[aria-current="page"] {
+    color: var(--text-on-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--amber);
+    text-underline-offset: 0.2em;
+  }
+
+  .site-header {
+    background: var(--ink);
+    color: var(--text-on-ink);
+  }
+
   .header-inner {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-sm);
     align-items: center;
-    justify-content: space-between;
+    gap: var(--space-xs) var(--space-md);
+    padding-block: 0.75rem;
   }
 
   .brand {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-xs);
-    font-family: var(--font-heading);
-    font-size: var(--step-1);
+    gap: 0.55rem;
     text-decoration: none;
+    margin-right: auto;
+    color: var(--paper);
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.05;
+  }
+
+  .brand-name {
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 600;
+  }
+
+  .brand-sub {
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-on-ink-muted);
+  }
+
+  /* Direct child only. A plain `.main-nav ul` also matched the submenu and,
+     being more specific than `.submenu`, forced it visible. */
+  .main-nav > ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-md);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .main-nav a {
+    display: inline-block;
+    text-decoration: none;
+    padding-block: 0.35rem;
+    border-bottom: 2px solid transparent;
+  }
+
+  .main-nav a:hover,
+  .main-nav a[aria-current="page"] {
+    border-bottom-color: var(--amber);
+  }
+
+  .has-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    border-radius: 2px;
+  }
+
+  .menu-toggle svg {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 150ms ease;
+  }
+
+  .has-menu.is-open .menu-toggle svg {
+    transform: rotate(180deg);
+  }
+
+  .menu-toggle:hover {
+    background: var(--ink-soft);
+  }
+
+  .submenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: -0.75rem;
+    z-index: 40;
+    min-width: 14rem;
+    margin: 0;
+    padding: 0.35rem 0;
+    list-style: none;
+    background: var(--ink-soft);
+    border: 1px solid var(--ink-line);
+    box-shadow: 0 12px 28px rgb(0 0 0 / 0.28);
+  }
+
+  .has-menu.is-open .submenu {
+    display: block;
+  }
+
+  .submenu a {
+    display: block;
+    padding: 0.4rem 0.9rem;
+    border-bottom: 0;
+    border-left: 3px solid transparent;
+    font-size: var(--step-0);
+    white-space: nowrap;
+  }
+
+  .submenu a:hover,
+  .submenu a[aria-current="page"] {
+    background: var(--ink);
+    border-left-color: var(--amber);
+    border-bottom-color: transparent;
+  }
+
+  /* On a phone the dropdown becomes an inline block rather than an overlay,
+     so nothing is hidden off the edge of the screen. */
+  @media (max-width: 47.9375em) {
+    .submenu {
+      position: static;
+      min-width: 0;
+      border-left: 3px solid var(--amber);
+      border-right: 0;
+      border-top: 0;
+      border-bottom: 0;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    .has-menu {
+      flex-wrap: wrap;
+    }
+
+    .has-menu.is-open {
+      width: 100%;
+    }
+
+    .submenu {
+      width: 100%;
+    }
+  }
+
+  /* Below the breakpoint the header was eating most of a phone screen. The
+     nav and the button share a row instead of stacking. */
+  @media (max-width: 47.9375em) {
+    .header-inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: var(--space-xs) var(--space-sm);
+    }
+
+    .brand {
+      margin-right: 0;
+    }
+
+    .header-cta {
+      padding: 0.55em 0.9em;
+      font-size: var(--step--1);
+    }
+
+    .main-nav {
+      grid-column: 1 / -1;
+    }
+
+    .main-nav > ul {
+      gap: 0 var(--space-sm);
+      justify-content: space-between;
+    }
+  }
+
+  @media (max-width: 22em) {
+    .brand-sub {
+      display: none;
+    }
   }
 </style>

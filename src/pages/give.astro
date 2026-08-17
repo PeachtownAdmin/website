@@ -1,0 +1,87 @@
+---
+import { getEntry, render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHeader from "../components/PageHeader.astro";
+import PayPalButton from "../components/PayPalButton.astro";
+
+// Give has its own route rather than living in the pages collection, because
+// the payment buttons are components, not text an editor should be pasting.
+// The wording above them stays editable in content/pages/give.md.
+
+const site = (await getEntry("settings", "site"))!.data;
+const page = await getEntry("pages", "give");
+const { Content } = page ? await render(page) : { Content: null };
+---
+
+<BaseLayout
+  title="Give"
+  description="Support Peachtown Elementary School, and pay tuition online."
+>
+  <PageHeader
+    title="Give"
+    description="Peachtown is a non-profit school. Gifts go straight into the program."
+  />
+
+  <div class="wrap page-body">
+    <div class="prose">
+      {Content && <Content />}
+    </div>
+
+    <div class="pay">
+      <section>
+        <h2>Make a donation</h2>
+        <p>Any amount helps, and every gift stays with the school.</p>
+        <PayPalButton
+          buttonId={site.paypalDonationButtonId ?? ""}
+          label="Donate with PayPal"
+          note="You can pay with a card without a PayPal account."
+        />
+      </section>
+
+      <section>
+        <h2>Pay tuition</h2>
+        <p>For families with a place at the school.</p>
+        <PayPalButton
+          buttonId={site.paypalTuitionButtonId ?? ""}
+          label="Pay tuition with PayPal"
+          note="Interest-free payment plans are available. Contact the office to arrange one."
+        />
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-body {
+    padding-block: var(--space-lg);
+    display: grid;
+    gap: var(--space-lg);
+    align-items: start;
+  }
+
+  @media (min-width: 58em) {
+    .page-body {
+      grid-template-columns: minmax(0, 1fr) 22rem;
+      gap: var(--space-xl);
+    }
+  }
+
+  .pay {
+    display: grid;
+    gap: var(--space-md);
+    background: var(--paper-dim);
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+    border-top: 4px solid var(--amber);
+  }
+
+  .pay h2 {
+    font-size: var(--step-1);
+    margin-bottom: var(--space-2xs);
+  }
+
+  .pay p {
+    color: var(--text-muted);
+    font-size: var(--step-0);
+    margin-bottom: var(--space-xs);
+  }
+</style>

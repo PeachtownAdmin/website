@@ -1,0 +1,135 @@
+---
+import Icon from "./Icon.astro";
+
+// The resource half of the site, given real estate directly under the hero
+// rather than buried. Sized for one-handed use on a phone.
+
+interface QuickLink {
+  label: string;
+  note?: string;
+  href: string;
+  icon: "calendar" | "form" | "megaphone" | "envelope";
+}
+
+interface Props {
+  links: QuickLink[];
+}
+
+const { links } = Astro.props;
+---
+
+{
+  links.length > 0 && (
+<section class="quick">
+  <div class="wrap">
+    <h2 class="visually-hidden">Quick links for current families</h2>
+    <ul role="list">
+      {
+        links.map((link) => (
+          <li>
+            <a href={link.href}>
+              <span class="quick-icon">
+                <Icon name={link.icon} size={22} />
+              </span>
+              <span class="quick-text">
+                <span class="quick-label">{link.label}</span>
+                <span class="quick-note">{link.note}</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+  )
+}
+
+<style>
+  .quick {
+    background: var(--paper);
+    border-bottom: var(--border);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 52em) {
+    ul {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  li + li a {
+    border-left: var(--border);
+  }
+
+  @media (max-width: 51.9375em) {
+    li:nth-child(odd) a {
+      border-left: 0;
+    }
+    li:nth-child(n + 3) a {
+      border-top: var(--border);
+    }
+  }
+
+  a {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: var(--space-sm) var(--space-xs);
+    text-decoration: none;
+    height: 100%;
+    transition: background-color 120ms ease;
+  }
+
+  a:hover {
+    background: var(--paper-dim);
+  }
+
+  .quick-icon {
+    display: inline-flex;
+    color: var(--amber);
+    padding-top: 0.15rem;
+  }
+
+  .quick-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+  }
+
+  .quick-label {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  a:hover .quick-label {
+    text-decoration: underline;
+    text-decoration-color: var(--amber);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.22em;
+  }
+
+  .quick-note {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    text-wrap: pretty;
+  }
+
+  /* On the narrowest phones the two-word notes were wrapping to three lines
+     and pushing the grid tall. */
+  @media (max-width: 24em) {
+    .quick-note {
+      display: none;
+    }
+  }
+</style>

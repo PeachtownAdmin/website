@@ -2,21 +2,147 @@
 import { getCollection, render } from "astro:content";
 import type { GetStaticPaths } from "astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHeader from "../components/PageHeader.astro";
+import SectionNav from "../components/SectionNav.astro";
 
 export const getStaticPaths = (async () => {
-  const pages = await getCollection("pages", (p) => !p.data.draft && p.id !== "home");
+  // Pages whose route is hand-built because it needs more than prose. Their
+  // text still lives in content/pages and stays editable.
+  // Declared inside because Astro hoists getStaticPaths above the frontmatter.
+  const customRoutes = new Set(["home", "give", "calendar", "staff"]);
+
+  const pages = await getCollection("pages", (p) => !p.data.draft && !customRoutes.has(p.id));
   return pages.map((page) => ({ params: { slug: page.id }, props: { page } }));
 }) satisfies GetStaticPaths;
 
 const { page } = Astro.props;
-const { Content } = await render(page);
+const { Content, headings } = await render(page);
+
+// Only worth an on-page contents list when the page is genuinely long.
+const toc = headings.filter((h) => h.depth === 2);
+const showToc = toc.length >= 4;
+
+const all = await getCollection("pages", (p) => !p.data.draft);
+const hasSectionNav =
+  all.some((p) => p.data.parent === page.id) ||
+  (page.data.parent !== undefined && all.some((p) => p.data.parent === page.data.parent));
+const hasSidebar = hasSectionNav || showToc;
 ---
 
 <BaseLayout title={page.data.title} description={page.data.description}>
-  <article>
-    <h1>{page.data.title}</h1>
-    <div class="prose">
+  <PageHeader title={page.data.title} description={page.data.description} solo={!hasSidebar} />
+
+  <div class:list={["wrap page-body", hasSidebar ? "has-sidebar" : "is-solo"]}>
+    {
+      hasSidebar && (
+        <aside class="sidebar">
+          <SectionNav current={page.id} parent={page.data.parent} />
+
+          {showToc && (
+            <nav class="toc" aria-label="On this page" data-toc>
+              <h2>On this page</h2>
+              <ul>
+                {toc.map((h) => (
+                  <li>
+                    <a href={`#${h.slug}`} data-toc-link={h.slug}>
+                      {h.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+        </aside>
+      )
+    }
+
+    <article class="prose">
       <Content />
-    </div>
-  </article>
+    </article>
+  </div>
 </BaseLayout>
+
+<script>
+  // Highlights the section you are currently reading, the way the Ithaca
+  // College sidebar does. Uses scroll position rather than IntersectionObserver
+  // visibility, so the last short section can still become current.
+  const toc = document.querySelector<HTMLElement>("[data-toc]");
+  if (toc) {
+    const links = Array.from(toc.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"));
+    const targets = links
+      .map((link) => document.getElementById(link.dataset.tocLink!))
+      .filter((el): el is HTMLElement => el !== null);
+
+    let ticking = false;
+
+    const update = () => {
+      ticking = false;
+      const line = window.scrollY + window.innerHeight * 0.25;
+      let active = 0;
+      targets.forEach((el, i) => {
+        if (el.getBoundingClientRect().top + window.scrollY <= line) active = i;
+      });
+      if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 4) {
+        active = targets.length - 1;
+      }
+      links.forEach((link, i) => {
+        link.classList.toggle("is-current", i === active);
+        if (i === active) link.setAttribute("aria-current", "true");
+        else link.removeAttribute("aria-current");
+      });
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    if (targets.length) {
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll, { passive: true });
+      update();
+    }
+  }
+</script>
+
+<style>
+  .toc h2 {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: var(--space-xs);
+  }
+
+  .toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+    border-left: 2px solid var(--paper-dim);
+  }
+
+  .toc a {
+    display: block;
+    padding: 0.1rem 0 0.1rem var(--space-xs);
+    font-size: var(--step--1);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    margin-left: -2px;
+  }
+
+  .toc a:hover {
+    border-left-color: var(--amber);
+    text-decoration: underline;
+  }
+
+  .toc a.is-current {
+    border-left-color: var(--amber);
+    background: var(--paper-dim);
+    font-weight: 700;
+  }
+</style>

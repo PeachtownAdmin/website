@@ -1,7 +1,7 @@
 ---
 title: "Home"
 description: "Peachtown Elementary School is an independent day school for Pre-K through grade 8 in Aurora, New York."
-showInNav: false
+navGroup: "none"
 order: 0
 draft: false
 ---

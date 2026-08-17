@@ -1,0 +1,173 @@
+---
+import { getEntry, getCollection, render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHeader from "../components/PageHeader.astro";
+import SectionNav from "../components/SectionNav.astro";
+
+// Staff are records rather than a wall of markup, so the school can add or
+// remove a person without editing around photographs.
+
+const page = await getEntry("pages", "staff");
+const { Content } = page ? await render(page) : { Content: null };
+
+const staff = (await getCollection("staff", (p) => !p.data.draft)).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const rendered = await Promise.all(
+  staff.map(async (person) => ({ person, Body: (await render(person)).Content }))
+);
+---
+
+<BaseLayout
+  title="Our Staff"
+  description="The teachers and administrators at Peachtown Elementary School."
+>
+  <PageHeader
+    title="Our Staff"
+    description="A small team who teach across subjects and know every student by name."
+  />
+
+  <div class="wrap page-body">
+    <aside class="sidebar">
+      <SectionNav current="staff" parent="about" />
+    </aside>
+
+    <div>
+      {Content && <div class="prose intro"><Content /></div>}
+
+      <ul class="people" role="list">
+        {
+          rendered.map(({ person, Body }) => (
+            <li class="person">
+              {person.data.photo ? (
+                <img
+                  class="person-photo"
+                  src={person.data.photo}
+                  alt={person.data.photoAlt ?? ""}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div class="person-photo person-photo-blank" aria-hidden="true" />
+              )}
+
+              <div class="person-text">
+                <h2>{person.data.name}</h2>
+                <p class="person-role">{person.data.role}</p>
+                {person.data.credentials && (
+                  <p class="person-credentials">{person.data.credentials}</p>
+                )}
+                <div class="prose person-bio">
+                  <Body />
+                </div>
+                {person.data.email && (
+                  <p class="person-email">
+                    <a href={`mailto:${person.data.email}`}>{person.data.email}</a>
+                  </p>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-body {
+    padding-block: var(--space-lg);
+    display: grid;
+    gap: var(--space-md);
+    align-items: start;
+  }
+
+  @media (min-width: 62em) {
+    .page-body {
+      grid-template-columns: 16rem minmax(0, 1fr);
+      gap: var(--space-xl);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: var(--space-sm);
+    }
+  }
+
+  .intro {
+    margin-bottom: var(--space-lg);
+  }
+
+  .people {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-lg);
+  }
+
+  .person {
+    display: grid;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+    border-top: 2px solid var(--paper-dim);
+  }
+
+  @media (min-width: 40em) {
+    .person {
+      grid-template-columns: 12rem minmax(0, 1fr);
+      gap: var(--space-md);
+    }
+  }
+
+  .person-photo {
+    width: 100%;
+    max-width: 12rem;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: var(--paper-dim);
+  }
+
+  .person-photo-blank {
+    display: none;
+  }
+
+  @media (min-width: 40em) {
+    .person-photo-blank {
+      display: block;
+      background: var(--paper-dim);
+    }
+  }
+
+  .person h2 {
+    font-size: var(--step-2);
+    margin-bottom: 0.1rem;
+  }
+
+  .person-role {
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .person-credentials {
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: var(--step-0);
+    margin: 0.15rem 0 var(--space-xs);
+  }
+
+  .person-bio {
+    max-width: 58ch;
+  }
+
+  .person-email {
+    margin: 0;
+  }
+
+  .person-email a {
+    text-decoration-color: var(--amber);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
+  }
+</style>

@@ -1,0 +1,261 @@
+---
+// Hero with a crossfading slideshow behind the headline.
+//
+// Height is capped so the headline and the visit button are always visible
+// without scrolling. The photograph is a backdrop, not the content.
+//
+// Slides come from the CMS, so they live in public/ and cannot go through
+// Astro's image pipeline. tools/optimize-uploads.mjs keeps their size sane.
+
+interface Slide {
+  image: { src: string; x: number; y: number };
+  alt: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  lede?: string;
+  slides: Slide[];
+  primaryLabel: string;
+  primaryHref: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
+}
+
+const {
+  eyebrow,
+  heading,
+  lede,
+  slides,
+  primaryLabel,
+  primaryHref,
+  secondaryLabel,
+  secondaryHref,
+} = Astro.props;
+const lines = heading.split(/(?<=\.)\s+/);
+---
+
+<section class="hero on-ink">
+  <div class="hero-media" data-slideshow>
+    {
+      slides.map((slide, i) => (
+        <img
+          src={slide.image.src}
+          alt={i === 0 ? slide.alt : ""}
+          class:list={["slide", i === 0 && "is-active"]}
+          style={`object-position: ${slide.image.x}% ${slide.image.y}%`}
+          loading={i === 0 ? "eager" : "lazy"}
+          fetchpriority={i === 0 ? "high" : undefined}
+          decoding="async"
+          aria-hidden={i === 0 ? undefined : "true"}
+        />
+      ))
+    }
+  </div>
+
+  <div class="hero-body">
+    <div class="wrap">
+      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+      <h1>{lines.map((line, i) => (i === 0 ? line : [<br />, line]))}</h1>
+      {lede && <p class="hero-lede">{lede}</p>}
+      <p class="hero-actions">
+        <a class="button" href={primaryHref}>{primaryLabel}</a>
+        {
+          secondaryLabel && secondaryHref && (
+            <a class="button button-quiet" href={secondaryHref}>
+              {secondaryLabel}
+            </a>
+          )
+        }
+      </p>
+    </div>
+  </div>
+
+  {
+    slides.length > 1 && (
+      <div class="hero-dots wrap">
+        <div class="dots" role="group" aria-label="Choose a photo">
+          {slides.map((slide, i) => (
+            <button
+              type="button"
+              class:list={["dot", i === 0 && "is-active"]}
+              data-slide={i}
+              aria-label={`Photo ${i + 1} of ${slides.length}`}
+              aria-pressed={i === 0 ? "true" : "false"}
+            />
+          ))}
+        </div>
+      </div>
+    )
+  }
+</section>
+
+<script>
+  // Crossfade. No auto-advance when the visitor prefers reduced motion, and
+  // it pauses whenever the tab is hidden or a control has focus.
+  const root = document.querySelector<HTMLElement>("[data-slideshow]");
+  const dots = Array.from(document.querySelectorAll<HTMLButtonElement>(".dot"));
+  if (root && dots.length > 1) {
+    const slides = Array.from(root.querySelectorAll<HTMLImageElement>(".slide"));
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let index = 0;
+    let timer: number | undefined;
+
+    const show = (next: number) => {
+      index = (next + slides.length) % slides.length;
+      slides.forEach((el, i) => el.classList.toggle("is-active", i === index));
+      dots.forEach((el, i) => {
+        el.classList.toggle("is-active", i === index);
+        el.setAttribute("aria-pressed", i === index ? "true" : "false");
+      });
+    };
+
+    const stop = () => window.clearInterval(timer);
+    const start = () => {
+      stop();
+      if (reduced.matches) return;
+      timer = window.setInterval(() => show(index + 1), 6500);
+    };
+
+    dots.forEach((dot, i) =>
+      dot.addEventListener("click", () => {
+        show(i);
+        start();
+      })
+    );
+
+    const hero = root.closest(".hero");
+    hero?.addEventListener("mouseenter", stop);
+    hero?.addEventListener("mouseleave", start);
+    hero?.addEventListener("focusin", stop);
+    hero?.addEventListener("focusout", start);
+    document.addEventListener("visibilitychange", () =>
+      document.hidden ? stop() : start()
+    );
+    reduced.addEventListener("change", start);
+    start();
+  }
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    display: grid;
+    grid-template-areas: "stack";
+    isolation: isolate;
+  }
+
+  .hero > * {
+    grid-area: stack;
+  }
+
+  .hero-media {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 900ms ease;
+  }
+
+  .slide.is-active {
+    opacity: 1;
+  }
+
+  /* A wash rather than a heavy dim, so the photograph still reads while the
+     text stays comfortably above 4.5:1. */
+  .hero-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      color-mix(in srgb, var(--ink) 88%, transparent) 0%,
+      color-mix(in srgb, var(--ink) 72%, transparent) 42%,
+      color-mix(in srgb, var(--ink) 34%, transparent) 100%
+    );
+  }
+
+  .hero-body {
+    position: relative;
+    z-index: 1;
+    align-self: center;
+    padding-block: var(--space-lg) calc(var(--space-lg) + 1rem);
+  }
+
+  .hero h1 {
+    max-width: 17ch;
+    margin-bottom: var(--space-xs);
+  }
+
+  .hero-lede {
+    max-width: 44ch;
+    font-size: var(--step-0);
+  }
+
+  @media (min-width: 48em) {
+    .hero-lede {
+      font-size: var(--step-1);
+    }
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-sm);
+    margin-top: var(--space-md);
+    margin-bottom: 0;
+  }
+
+  .hero-dots {
+    position: relative;
+    z-index: 2;
+    align-self: end;
+    justify-self: center;
+    padding-bottom: var(--space-sm);
+    pointer-events: none;
+  }
+
+  .dots {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    pointer-events: auto;
+  }
+
+  .dot {
+    width: 2.25rem;
+    height: 0.3rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--paper) 40%, transparent);
+    cursor: pointer;
+    transition: background-color 200ms ease;
+  }
+
+  .dot.is-active {
+    background: var(--amber);
+  }
+
+  /* Capped rather than driven by the image's own aspect ratio, which used to
+     fill a desktop screen entirely and push the headline out of sight. The
+     ceiling is what binds on a large monitor, so that is the number to change
+     if the banner ever needs to be taller again. */
+  .hero-media {
+    min-height: 20rem;
+  }
+
+  @media (min-width: 48em) {
+    .hero-media {
+      min-height: clamp(38rem, 82vh, 55rem);
+    }
+  }
+</style>

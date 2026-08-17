@@ -1,0 +1,45 @@
+---
+// Title band for interior pages. Without it a page opened directly from the
+// menu began with a bare h1 on paper and read as an unstyled document.
+
+interface Props {
+  title: string;
+  description?: string;
+  eyebrow?: string;
+  // Solo pages have no sidebar, so the title is centred to match the body.
+  solo?: boolean;
+}
+
+const { title, description, eyebrow, solo = false } = Astro.props;
+---
+
+<div class:list={["page-header on-ink", solo && "is-solo"]}>
+  <div class="wrap">
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1>{title}</h1>
+    {description && <p class="page-lede">{description}</p>}
+  </div>
+</div>
+
+<style>
+  .page-header {
+    padding-block: var(--space-md) var(--space-lg);
+    border-bottom: 4px solid var(--amber);
+  }
+
+  h1 {
+    max-width: 20ch;
+    margin-bottom: 0;
+  }
+
+  .is-solo .wrap {
+    max-width: var(--measure);
+  }
+
+  .page-lede {
+    max-width: 52ch;
+    margin: var(--space-sm) 0 0;
+    font-size: var(--step-1);
+    color: var(--text-on-ink);
+  }
+</style>
