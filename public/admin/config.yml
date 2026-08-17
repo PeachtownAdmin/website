@@ -1,0 +1,231 @@
+backend:
+  name: github
+  repo: PLACEHOLDER-OWNER/peachtown-website
+  branch: main
+  base_url: https://PLACEHOLDER-WORKER.workers.dev
+
+# Lets the CMS talk to decap-server and write straight to disk during local
+# development. Ignored once the site is served from a real domain.
+local_backend: true
+
+media_folder: public/images/uploads
+public_folder: /images/uploads
+
+publish_mode: simple
+site_url: /
+display_url: /
+
+collections:
+  - name: settings
+    label: School information
+    description: Details that appear across the whole website.
+    editor:
+      preview: false
+    files:
+      - name: site
+        label: School details
+        file: content/settings/site.json
+        fields:
+          - { name: schoolName, label: Full school name, widget: string }
+          - {
+              name: shortName,
+              label: Short name,
+              widget: string,
+              hint: Used in the menu bar and page titles.,
+            }
+          - {
+              name: tagline,
+              label: Tagline,
+              widget: text,
+              required: false,
+              hint: One sentence describing the school. Appears on the home page.,
+            }
+          - name: address
+            label: Address
+            widget: object
+            fields:
+              - { name: street, label: Street, widget: string }
+              - { name: city, label: Town, widget: string }
+              - { name: state, label: State, widget: string }
+              - { name: zip, label: ZIP code, widget: string }
+          - { name: phone, label: Phone number, widget: string, required: false }
+          - { name: email, label: Email address, widget: string, required: false }
+          - {
+              name: officeHours,
+              label: Office hours,
+              widget: string,
+              required: false,
+            }
+          - {
+              name: facebookUrl,
+              label: Facebook page link,
+              widget: string,
+              required: false,
+            }
+          - {
+              name: googleCalendarId,
+              label: Google Calendar ID,
+              widget: string,
+              required: false,
+              hint: Leave this alone unless the school calendar changes.,
+            }
+          - {
+              name: paypalTuitionButtonId,
+              label: PayPal tuition button ID,
+              widget: string,
+              required: false,
+              hint: Leave this alone unless PayPal is reconfigured.,
+            }
+          - {
+              name: paypalDonationButtonId,
+              label: PayPal donation button ID,
+              widget: string,
+              required: false,
+              hint: Leave this alone unless PayPal is reconfigured.,
+            }
+
+  - name: pages
+    label: Pages
+    editor:
+      preview: false
+    label_singular: page
+    description: The main pages of the website.
+    folder: content/pages
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    identifier_field: title
+    fields:
+      - { name: title, label: Page title, widget: string }
+      - {
+          name: navLabel,
+          label: Menu label,
+          widget: string,
+          required: false,
+          hint: Shorter wording for the menu bar. Leave blank to use the page title.,
+        }
+      - {
+          name: description,
+          label: Search engine summary,
+          widget: text,
+          required: false,
+          hint: One or two sentences shown in Google results.,
+        }
+      - {
+          name: showInNav,
+          label: Show this page in the menu bar,
+          widget: boolean,
+          default: false,
+        }
+      - {
+          name: order,
+          label: Menu position,
+          widget: number,
+          default: 0,
+          value_type: int,
+          hint: Lower numbers appear first.,
+        }
+      - {
+          name: heroImage,
+          label: Banner photo,
+          widget: image,
+          required: false,
+          choose_url: false,
+        }
+      - {
+          name: heroImageAlt,
+          label: Banner photo description,
+          widget: string,
+          required: false,
+          hint: Describe the photo for visitors who cannot see it.,
+        }
+      - {
+          name: draft,
+          label: Hide this page from the website,
+          widget: boolean,
+          default: false,
+        }
+      - { name: body, label: Page content, widget: markdown }
+
+  - name: news
+    label: News and announcements
+    editor:
+      preview: false
+    label_singular: announcement
+    folder: content/news
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    identifier_field: title
+    sortable_fields: [date, title]
+    view_filters:
+      - { label: Published, field: draft, pattern: false }
+      - { label: Drafts, field: draft, pattern: true }
+    fields:
+      - { name: title, label: Headline, widget: string }
+      - { name: date, label: Date, widget: datetime, format: "YYYY-MM-DD" }
+      - {
+          name: summary,
+          label: Short summary,
+          widget: text,
+          required: false,
+          hint: One or two sentences shown in the news list.,
+        }
+      - {
+          name: heroImage,
+          label: Main photo,
+          widget: image,
+          required: false,
+          choose_url: false,
+        }
+      - {
+          name: heroImageAlt,
+          label: Main photo description,
+          widget: string,
+          required: false,
+        }
+      - {
+          name: draft,
+          label: Save as draft (not visible on the website),
+          widget: boolean,
+          default: true,
+        }
+      - { name: body, label: Announcement, widget: markdown }
+
+  - name: staff
+    label: Staff
+    editor:
+      preview: false
+    label_singular: staff member
+    folder: content/staff
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    identifier_field: name
+    fields:
+      - { name: name, label: Name, widget: string }
+      - { name: role, label: Role or job title, widget: string }
+      - { name: photo, label: Photo, widget: image, required: false, choose_url: false }
+      - {
+          name: photoAlt,
+          label: Photo description,
+          widget: string,
+          required: false,
+        }
+      - {
+          name: order,
+          label: Position in the list,
+          widget: number,
+          default: 0,
+          value_type: int,
+        }
+      - {
+          name: draft,
+          label: Hide this person from the website,
+          widget: boolean,
+          default: false,
+        }
+      - { name: body, label: Biography, widget: markdown, required: false }

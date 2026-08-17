@@ -1,0 +1,38 @@
+/*
+  Design tokens. The visual direction is not decided yet, so these are
+  deliberately plain. Changing the look means changing values here, not
+  hunting through components.
+*/
+
+:root {
+  /* Sampled from the school logo. */
+  --color-brand: #0b2116;
+  --color-brand-soft: #78867e;
+
+  /* Placeholder accent. Muted terracotta, pending sign-off. */
+  --color-accent: #a85f3f;
+  --color-accent-contrast: #ffffff;
+
+  --color-text: #1c1c1a;
+  --color-text-muted: #5a6560;
+  --color-bg: #fdfcf9;
+  --color-surface: #f3f0e9;
+  --color-border: #ddd8cc;
+
+  --font-heading: Georgia, "Times New Roman", serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: 1.5rem;
+  --step-3: 2rem;
+  --step-4: 2.75rem;
+
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 4rem;
+
+  --measure: 68ch;
+  --radius: 4px;
+}

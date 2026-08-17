@@ -1,0 +1,21 @@
+{
+  "name": "peachtown-website",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node tools/sync-cms-bundle.mjs && astro dev",
+    "cms": "decap-server",
+    "build": "node tools/sync-cms-bundle.mjs && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "sync-cms": "node tools/sync-cms-bundle.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.18.2"
+  },
+  "devDependencies": {
+    "decap-cms": "^3.15.1",
+    "decap-server": "^3.10.0"
+  }
+}

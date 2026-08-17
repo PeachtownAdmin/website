@@ -1,0 +1,62 @@
+---
+import { getEntry, getCollection, render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const site = (await getEntry("settings", "site"))!.data;
+const home = await getEntry("pages", "home");
+const { Content } = home ? await render(home) : { Content: null };
+
+const recent = (await getCollection("news", (p) => !p.data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 2);
+---
+
+<BaseLayout title={site.schoolName} description={site.tagline}>
+  <h1>{site.schoolName}</h1>
+  {site.tagline && <p class="tagline">{site.tagline}</p>}
+
+  <div class="prose">
+    {Content ? <Content /> : <p>Home page content has not been written yet.</p>}
+  </div>
+
+  {
+    recent.length > 0 && (
+      <section>
+        <h2>Latest news</h2>
+        <ul class="news-list">
+          {recent.map((post) => (
+            <li>
+              <a href={`/news/${post.id}/`}>{post.data.title}</a>
+              <time datetime={post.data.date.toISOString()}>
+                {post.data.date.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </time>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .tagline {
+    font-size: var(--step-1);
+    color: var(--color-text-muted);
+    max-width: var(--measure);
+  }
+
+  .news-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .news-list time {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: 0.9em;
+  }
+</style>

@@ -1,0 +1,19 @@
+---
+// The CMS admin panel, as a real route so /admin/ resolves in the dev server
+// as well as in the build.
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Peachtown site editor</title>
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
+  </head>
+  <body>
+    <script is:inline src="/admin/decap/decap-cms.js"></script>
+  </body>
+</html>

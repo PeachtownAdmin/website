@@ -1,0 +1,43 @@
+---
+import { getEntry } from "astro:content";
+import "../styles/tokens.css";
+import "../styles/base.css";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const site = (await getEntry("settings", "site"))!.data;
+const fullTitle = title === site.schoolName ? title : `${title} | ${site.shortName}`;
+const isProduction = __IS_PRODUCTION__;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    {description && <meta name="description" content={description} />}
+    {!isProduction && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:title" content={fullTitle} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <SiteHeader />
+    <main id="main">
+      <div class="wrap">
+        <slot />
+      </div>
+    </main>
+    <SiteFooter />
+  </body>
+</html>

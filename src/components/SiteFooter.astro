@@ -1,0 +1,36 @@
+---
+import { getEntry } from "astro:content";
+
+const site = (await getEntry("settings", "site"))!.data;
+const { address } = site;
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <h2 class="visually-hidden">Site information</h2>
+
+    <address>
+      <strong>{site.schoolName}</strong><br />
+      {address.street}<br />
+      {address.city}, {address.state} {address.zip}
+      {site.phone && (<><br /><a href={`tel:${site.phone.replace(/[^0-9+]/g, "")}`}>{site.phone}</a></>)}
+      {site.email && (<><br /><a href={`mailto:${site.email}`}>{site.email}</a></>)}
+    </address>
+
+    {site.officeHours && <p>{site.officeHours}</p>}
+
+    <ul>
+      {site.facebookUrl && (
+        <li><a href={site.facebookUrl} rel="noopener">Facebook</a></li>
+      )}
+      <li><a href="/admin/">Staff login</a></li>
+    </ul>
+  </div>
+</footer>
+
+<style>
+  address {
+    font-style: normal;
+    margin-bottom: var(--space-sm);
+  }
+</style>

@@ -1,0 +1,51 @@
+---
+import { getEntry, getCollection } from "astro:content";
+
+const site = (await getEntry("settings", "site"))!.data;
+
+// Nav is driven by page frontmatter, so editors control order and labels
+// without touching templates.
+const navPages = (await getCollection("pages", (p) => p.data.showInNav && !p.data.draft)).sort(
+  (a, b) => a.data.order - b.data.order
+);
+---
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">
+      <img src="/images/logo-mark.png" alt="" width="60" height="40" />
+      <span>{site.shortName}</span>
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        {
+          navPages.map((page) => (
+            <li>
+              <a href={`/${page.id}/`}>{page.data.navLabel ?? page.data.title}</a>
+            </li>
+          ))
+        }
+        <li><a href="/news/">News</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-family: var(--font-heading);
+    font-size: var(--step-1);
+    text-decoration: none;
+  }
+</style>

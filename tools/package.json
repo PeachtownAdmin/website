@@ -1,0 +1,9 @@
+{
+  "name": "peachtown-scrape-tools",
+  "private": true,
+  "type": "module",
+  "description": "One-off migration tooling for pulling content off the old Blogger site.",
+  "dependencies": {
+    "turndown": "^7.2.0"
+  }
+}
