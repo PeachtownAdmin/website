@@ -119,7 +119,13 @@ export async function onRequest(context) {
     );
   }
 
-  if (request.method === "POST") {
+  // Only the login page itself treats a POST as a sign in attempt. Anything
+  // deeper under /admin, such as the CMS proxy, posts JSON and must be passed
+  // through to its own handler once the session checks out.
+  const { pathname } = new URL(request.url);
+  const isLoginPage = /^\/admin\/?$/.test(pathname) || pathname === "/admin/index.html";
+
+  if (request.method === "POST" && isLoginPage) {
     const form = await request.formData();
     const username = String(form.get("username") || "").trim();
     const password = String(form.get("password") || "");
@@ -137,7 +143,7 @@ export async function onRequest(context) {
     return new Response(null, {
       status: 303,
       headers: {
-        location: new URL(request.url).pathname,
+        location: pathname,
         "set-cookie":
           `${COOKIE}=${encodeURIComponent(token)}; Path=/admin; HttpOnly; Secure; ` +
           `SameSite=Lax; Max-Age=${MAX_AGE}`,
@@ -163,6 +169,13 @@ export async function onRequest(context) {
     const known = users.some((u) => u.user === username);
 
     if (live && known && safeEqual(provided, expected)) return next();
+  }
+
+  if (!isLoginPage) {
+    return new Response(JSON.stringify({ error: "Not signed in" }), {
+      status: 401,
+      headers: { "content-type": "application/json", "cache-control": "no-store" },
+    });
   }
 
   return htmlResponse(loginPage(""), 401);

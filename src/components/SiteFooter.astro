@@ -1,13 +1,14 @@
 ---
-import { getEntry, getCollection } from "astro:content";
+import { getEntry } from "astro:content";
 import Logo from "./Logo.astro";
+import { navItems, byOrder } from "../lib/navigation";
 
 const site = (await getEntry("settings", "site"))!.data;
 const { address } = site;
 
-const pages = (await getCollection("pages", (p) => !p.data.draft && p.data.navGroup !== "none"))
-  .sort((a, b) => a.data.order - b.data.order)
-  .map((p) => ({ href: `/${p.id}/`, label: p.data.navLabel ?? p.data.title }));
+// Through the shared helper, so a page that is only a link to another website
+// is listed as that link rather than as a route that was never built.
+const pages = (await navItems()).filter((i) => i.navGroup !== "none").sort(byOrder);
 
 ---
 
@@ -38,7 +39,15 @@ const pages = (await getCollection("pages", (p) => !p.data.draft && p.data.navGr
     <div>
       <h2 class="eyebrow">Pages</h2>
       <ul class="plain">
-        {pages.map((p) => <li><a href={p.href}>{p.label}</a></li>)}
+        {
+          pages.map((p) => (
+            <li>
+              <a href={p.href} {...(p.newTab ? { target: "_blank", rel: "noopener" } : {})}>
+                {p.label}
+              </a>
+            </li>
+          ))
+        }
         <li><a href="/news/">News</a></li>
       </ul>
     </div>

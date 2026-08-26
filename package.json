@@ -5,20 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "node tools/sync-cms-bundle.mjs && astro dev",
-    "cms": "decap-server",
-    "build": "node tools/sync-cms-bundle.mjs && node tools/optimize-uploads.mjs && astro build",
+    "build": "node tools/sync-cms-bundle.mjs && node tools/optimize-uploads.mjs && astro build && node tools/write-headers.mjs && node tools/write-redirects.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "sync-cms": "node tools/sync-cms-bundle.mjs",
     "logo": "node tools/build-logo.mjs",
     "fonts": "node tools/fetch-fonts.mjs",
-    "optimize": "node tools/optimize-uploads.mjs"
+    "optimize": "node tools/optimize-uploads.mjs",
+    "admin:credentials": "node tools/make-admin-credentials.mjs"
   },
   "dependencies": {
     "astro": "^5.18.2"
   },
   "devDependencies": {
-    "decap-cms": "^3.15.1",
-    "decap-server": "^3.10.0"
+    "decap-cms": "^3.15.1"
   }
 }

@@ -1,0 +1,41 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHeader from "../components/PageHeader.astro";
+
+// Without this file every unknown address answered 200 with a page, which is
+// worse than untidy. A crawler asking for /robots.txt got HTML and a 200, so
+// it had no rules to follow, and Cloudflare's managed robots.txt does not step
+// in when the origin answers for itself. Missing pages must say they are
+// missing.
+---
+
+<BaseLayout title="Page not found">
+  <PageHeader
+    title="Page not found"
+    description="That address does not match anything on the website."
+    solo={true}
+  />
+
+  <div class="wrap page-body is-solo">
+    <article class="prose">
+      <p>
+        The page may have been renamed or removed. These are the places most
+        people are looking for:
+      </p>
+
+      <ul>
+        <li><a href="/">The home page</a></li>
+        <li><a href="/about/">About the school</a></li>
+        <li><a href="/academics/">Academics</a></li>
+        <li><a href="/admissions/">Admissions</a></li>
+        <li><a href="/news/">News and announcements</a></li>
+        <li><a href="/contact/">Contact the office</a></li>
+      </ul>
+
+      <p>
+        If you followed a link on this website to get here, please tell the
+        office so it can be fixed.
+      </p>
+    </article>
+  </div>
+</BaseLayout>

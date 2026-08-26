@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+.env
+.env.*
+.DS_Store
+
+# Copied from node_modules by tools/sync-cms-bundle.mjs
+public/admin/decap/
+
+docs/
+screenshots/
+scrape/
+
+# Local admin credentials for wrangler. Never commit.
+.dev.vars

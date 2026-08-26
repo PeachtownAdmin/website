@@ -19,6 +19,11 @@ const pages = defineCollection({
     // Slug of the page this one sits under. Drives the menu dropdowns and the
     // sidebar on interior pages.
     parent: z.string().optional(),
+    // A page can instead be a menu entry that goes straight to another
+    // website. No route is built for it. Both are needed: unticking the box
+    // must stop it being a link even if the address is left behind.
+    isLink: z.boolean().default(false),
+    linkUrl: z.string().optional(),
     draft: z.boolean().default(false),
     legacyUrl: z.string().optional(),
   }),

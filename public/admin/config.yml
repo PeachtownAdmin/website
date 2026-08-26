@@ -1,12 +1,11 @@
 backend:
   name: github
-  repo: PLACEHOLDER-OWNER/peachtown-website
+  repo: PeachtownAdmin/website
   branch: main
-  base_url: https://PLACEHOLDER-WORKER.workers.dev
-
-# Lets the CMS talk to decap-server and write straight to disk during local
-# development. Ignored once the site is served from a real domain.
-local_backend: true
+  # Filled in per request by functions/admin/config.yml.js, so the editor works
+  # on peachtown.pages.dev and on the real domain with no rebuild.
+  base_url: https://base-url-is-set-per-request.invalid
+  auth_endpoint: auth
 
 media_folder: public/images/uploads
 public_folder: /images/uploads
@@ -173,6 +172,26 @@ collections:
     identifier_field: title
     fields:
       - { name: title, label: Page title, widget: string }
+      # linkmode is a custom widget. Ticking it hides the fields a link has no
+      # use for, so the form becomes a name and an address. See form-rules.js.
+      - {
+          name: isLink,
+          label: This is a link to another website,
+          widget: linkmode,
+          default: false,
+          hint: Tick this to make the menu entry go straight to another website
+            instead of to a page here.,
+        }
+      - name: linkUrl
+        label: Web address to send visitors to
+        widget: string
+        required: false
+        # Catches the commonest mistake, pasting a bare domain, which the
+        # browser would read as a page on this site.
+        pattern:
+          - "^$|^(https?://|mailto:|tel:).+"
+          - "Start the address with https://, for example https://www.example.com"
+        hint: "Only used when the box above is ticked. Start with https://"
       - {
           name: navLabel,
           label: Menu label,
@@ -187,15 +206,35 @@ collections:
           required: false,
           hint: One or two sentences shown in Google results.,
         }
+      # navplace is a custom widget: the same three choices, but it also hides
+      # "Sits under" for the top bar, which has no drop-downs. See form-rules.js.
       - name: navGroup
         label: Where this page appears in the menus
-        widget: select
+        widget: navplace
         default: none
         options:
           - { label: Not in any menu, value: none }
           - { label: Main menu, value: main }
           - { label: Small links bar at the very top, value: utility }
         hint: The small top bar is for things current families need often, like the calendar.
+      - name: parent
+        label: Sits under
+        widget: relation
+        required: false
+        collection: pages
+        value_field: "{{slug}}"
+        display_fields: [title]
+        search_fields: [title]
+        # Only pages on the main menu can be a parent. Menus are one level
+        # deep, so offering a page that is itself in a drop-down would build a
+        # sub-drop-down that the site does not render.
+        filters:
+          - { field: navGroup, values: [main] }
+        hint: >-
+          Puts this page in the drop-down under another page, for example
+          Drama under Academics. Leave blank for a page that stands on its own.
+          A page that sits under another one appears only in that drop-down,
+          not on the bar itself.
       - {
           name: order,
           label: Menu position,
@@ -224,7 +263,10 @@ collections:
           widget: boolean,
           default: false,
         }
-      - { name: body, label: Page content, widget: markdown }
+      # Not required: a page that is only a link to another website has no
+      # body, and the field is hidden in that case, so Decap must not refuse
+      # to save it for being empty.
+      - { name: body, label: Page content, widget: markdown, required: false }
 
   - name: news
     label: News and announcements

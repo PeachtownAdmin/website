@@ -1,34 +1,36 @@
 ---
-import { getEntry, getCollection } from "astro:content";
+import { getEntry } from "astro:content";
 import Logo from "./Logo.astro";
+import { navItems, byOrder, type NavItem } from "../lib/navigation";
 
 const site = (await getEntry("settings", "site"))!.data;
 const path = Astro.url.pathname;
 
-const pages = await getCollection("pages", (p) => !p.data.draft);
+const items = await navItems();
+
+// A page that sits under another one belongs in that drop-down and nowhere
+// else. Without the parent check it appears twice: once as its own top level
+// item and again inside its parent's menu.
 const inGroup = (group: string) =>
-  pages
-    .filter((p) => p.data.navGroup === group)
-    .sort((a, b) => a.data.order - b.data.order)
-    .map((p) => ({ href: `/${p.id}/`, label: p.data.navLabel ?? p.data.title }));
+  items.filter((i) => i.navGroup === group && !i.parent).sort(byOrder);
 
 // News is a route rather than an editable page, so it is appended by hand.
-const utility = [...inGroup("utility"), { href: "/news/", label: "News" }];
+const utility = [
+  ...inGroup("utility"),
+  { href: "/news/", label: "News", newTab: false } as NavItem,
+];
 
 // Top level items carry their children, so the subject pages are reachable
-// from the menu rather than only from links inside prose.
-const main = inGroup("main").map((item) => {
-  const id = item.href.replace(/\//g, "");
-  return {
-    ...item,
-    children: pages
-      .filter((p) => p.data.parent === id)
-      .sort((a, b) => a.data.order - b.data.order)
-      .map((p) => ({ href: `/${p.id}/`, label: p.data.navLabel ?? p.data.title })),
-  };
-});
+// from the menu rather than only from links inside prose. An external link
+// can never be a parent, so children are matched on the page id.
+const main = inGroup("main").map((item) => ({
+  ...item,
+  children: item.id ? items.filter((i) => i.parent === item.id).sort(byOrder) : [],
+}));
 
 const current = (href: string) => path === href || (href !== "/" && path.startsWith(href));
+const linkAttrs = (item: NavItem) =>
+  item.newTab ? { target: "_blank", rel: "noopener" } : {};
 ---
 
 <div class="utility">
@@ -38,7 +40,11 @@ const current = (href: string) => path === href || (href !== "/" && path.startsW
       {
         utility.map((item) => (
           <li>
-            <a href={item.href} aria-current={current(item.href) ? "page" : undefined}>
+            <a
+              href={item.href}
+              aria-current={current(item.href) ? "page" : undefined}
+              {...linkAttrs(item)}
+            >
               {item.label}
             </a>
           </li>
@@ -64,13 +70,21 @@ const current = (href: string) => path === href || (href !== "/" && path.startsW
           main.map((item) =>
             item.children.length === 0 ? (
               <li>
-                <a href={item.href} aria-current={current(item.href) ? "page" : undefined}>
+                <a
+                  href={item.href}
+                  aria-current={current(item.href) ? "page" : undefined}
+                  {...linkAttrs(item)}
+                >
                   {item.label}
                 </a>
               </li>
             ) : (
               <li class="has-menu" data-menu>
-                <a href={item.href} aria-current={current(item.href) ? "page" : undefined}>
+                <a
+                  href={item.href}
+                  aria-current={current(item.href) ? "page" : undefined}
+                  {...linkAttrs(item)}
+                >
                   {item.label}
                 </a>
                 <button type="button" class="menu-toggle" aria-expanded="false" data-menu-button>
@@ -88,7 +102,11 @@ const current = (href: string) => path === href || (href !== "/" && path.startsW
                 <ul class="submenu" data-menu-list>
                   {item.children.map((child) => (
                     <li>
-                      <a href={child.href} aria-current={current(child.href) ? "page" : undefined}>
+                      <a
+                        href={child.href}
+                        aria-current={current(child.href) ? "page" : undefined}
+                        {...linkAttrs(child)}
+                      >
                         {child.label}
                       </a>
                     </li>

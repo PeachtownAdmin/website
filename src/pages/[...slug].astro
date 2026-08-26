@@ -4,6 +4,7 @@ import type { GetStaticPaths } from "astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHeader from "../components/PageHeader.astro";
 import SectionNav from "../components/SectionNav.astro";
+import { navItems } from "../lib/navigation";
 
 export const getStaticPaths = (async () => {
   // Pages whose route is hand-built because it needs more than prose. Their
@@ -11,7 +12,12 @@ export const getStaticPaths = (async () => {
   // Declared inside because Astro hoists getStaticPaths above the frontmatter.
   const customRoutes = new Set(["home", "give", "calendar", "staff"]);
 
-  const pages = await getCollection("pages", (p) => !p.data.draft && !customRoutes.has(p.id));
+  // A page that is only a link to another website gets no route of its own.
+  const { isExternal } = await import("../lib/navigation");
+  const pages = await getCollection(
+    "pages",
+    (p) => !p.data.draft && !customRoutes.has(p.id) && !isExternal(p)
+  );
   return pages.map((page) => ({ params: { slug: page.id }, props: { page } }));
 }) satisfies GetStaticPaths;
 
@@ -22,10 +28,10 @@ const { Content, headings } = await render(page);
 const toc = headings.filter((h) => h.depth === 2);
 const showToc = toc.length >= 4;
 
-const all = await getCollection("pages", (p) => !p.data.draft);
+const all = await navItems();
 const hasSectionNav =
-  all.some((p) => p.data.parent === page.id) ||
-  (page.data.parent !== undefined && all.some((p) => p.data.parent === page.data.parent));
+  all.some((i) => i.parent === page.id) ||
+  (page.data.parent !== undefined && all.some((i) => i.parent === page.data.parent));
 const hasSidebar = hasSectionNav || showToc;
 ---
 

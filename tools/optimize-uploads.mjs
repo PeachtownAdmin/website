@@ -7,7 +7,10 @@
 // Resizes in place, keeps the filename and format so nothing breaks, and only
 // touches files that are actually oversized, so re-running is cheap.
 //
-// Requires imagemagick. Runs automatically before build.
+// Requires imagemagick 7 (the `magick` command). Runs automatically before
+// build, and is skipped entirely when that is not installed: the Cloudflare
+// Pages build image has no imagemagick, and the files it would resize are
+// already committed at a sane size, so there is nothing for it to do there.
 
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
@@ -21,6 +24,22 @@ const MAX_BYTES = 500 * 1024;
 const QUALITY = 82;
 
 const EXT = /\.(jpe?g|png|webp)$/i;
+
+// Checked once rather than letting 350 individual calls fail. Without this the
+// Pages build log is a wall of "could not read" warnings that look like damage.
+function hasImageMagick() {
+  try {
+    execFileSync("magick", ["-version"], { stdio: "ignore" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+if (!hasImageMagick()) {
+  console.log("  uploads skipped (imagemagick not installed)");
+  process.exit(0);
+}
 
 let checked = 0;
 let changed = 0;

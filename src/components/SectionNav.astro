@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import { navItems, byOrder } from "../lib/navigation";
 
 // Sidebar listing the other pages in this section, the way a college site
 // does. It is also how the subject pages become reachable at all: they are
@@ -15,17 +16,16 @@ const { current, parent } = Astro.props;
 const pages = await getCollection("pages", (p) => !p.data.draft);
 const byId = new Map(pages.map((p) => [p.id, p]));
 
+// Sections hold external links as well as pages, so the sidebar is built from
+// the same merged list as the header.
+const all = await navItems();
+
 // A page shows its own children if it has any, otherwise its siblings.
-const children = pages.filter((p) => p.data.parent === current);
+const children = all.filter((i) => i.parent === current);
 const sectionId = children.length > 0 ? current : parent;
 const section = sectionId ? byId.get(sectionId) : undefined;
 
-const items = sectionId
-  ? pages
-      .filter((p) => p.data.parent === sectionId)
-      .sort((a, b) => a.data.order - b.data.order)
-      .map((p) => ({ href: `/${p.id}/`, label: p.data.navLabel ?? p.data.title, id: p.id }))
-  : [];
+const items = sectionId ? all.filter((i) => i.parent === sectionId).sort(byOrder) : [];
 ---
 
 {
@@ -37,7 +37,11 @@ const items = sectionId
       <ul>
         {items.map((item) => (
           <li>
-            <a href={item.href} aria-current={item.id === current ? "page" : undefined}>
+            <a
+              href={item.href}
+              aria-current={item.id === current ? "page" : undefined}
+              {...(item.newTab ? { target: "_blank", rel: "noopener" } : {})}
+            >
               {item.label}
             </a>
           </li>
