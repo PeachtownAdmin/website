@@ -1,10 +1,12 @@
 ---
-title: "Calendar"
-description: "Term dates, events and performances at Peachtown."
-navGroup: "utility"
+title: Calendar
+isLink: true
+linkUrl: https://calendar.google.com/calendar/embed?src=c_819d0d6d13228fb7d5876741e3447e6d915d5e17e8a554bf96248a92a2a9ef2e%40group.calendar.google.com&ctz=UTC
+description: Term dates, events and performances at Peachtown.
+navGroup: utility
 order: 10
 draft: false
-legacyUrl: "http://www.peachtownschool.com/p/calendar.html"
+legacyUrl: http://www.peachtownschool.com/p/calendar.html
 ---
 
 Term dates, performances, open houses and closures are all listed here.
