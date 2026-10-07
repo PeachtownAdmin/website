@@ -1,25 +1,27 @@
 ---
-title: "About Us"
-navLabel: "About"
-description: "An independent, non-sectarian day school for Pre-K through grade 8 in Aurora, New York, founded in 1990."
-navGroup: "main"
+title: About Us
+isLink: true
+navLabel: About
+description: An independent, non-sectarian day school for Pre-K through grade 8
+  in Aurora, New York, founded in 1990.
+navGroup: main
 order: 10
 draft: false
-legacyUrl: "http://www.peachtownschool.com/p/about-peachtown.html"
+legacyUrl: http://www.peachtownschool.com/p/about-peachtown.html
 ---
 
 
-Peachtown Elementary School is an independent non-sectarian day school for grades Pre-K through 8, located on the Wells College campus in Aurora, New York. With an enrollment of 25 students and a student teacher ratio of 6:1, Peachtown offers a highly individualized educational program featuring: multi-age classrooms, global education, interdisciplinary curriculum, developmental approach, hands-on learning, foreign languages, swimming instruction, creative and performing arts. Peachtown was founded in 1990.
+Peachtown Elementary School is an independent non-sectarian day school for grades Pre-K through 8, located on the campus of the former Wells College in Aurora, New York. With an enrollment of 25 students and a student teacher ratio of 6:1, Peachtown offers a highly individualized educational program featuring: multi-age classrooms, global education, interdisciplinary curriculum, developmental approach, hands-on learning, foreign languages, swimming instruction, creative and performing arts. Peachtown was founded in 1990.
 
   
 
 ## Our Philosophy
   
-A Peachtown education promotes personal responsibility and self-reliance, as well as a sense of family, tolerance and community. Located in a former home, the informal setting creates a comfortable and secure environment. Children learn at a pace that challenges, but does not intimidate or bore. A close relationship with the Wells College community was a wonderful benefit to our program.  We hope that the future owners of the campus will be open to building the same kind of mutually beneficial relationship with us.    
+A Peachtown education promotes personal responsibility and self-reliance, as well as a sense of family, tolerance and community. Located in a former home, the informal setting creates a comfortable and secure environment. Children learn at a pace that challenges, but does not intimidate or bore.     
   
 ## Our Students
   
-From all walks of life and of all abilities, from different ethnic, religious, and socio-economic backgrounds, Peachtown students form one cohesive community. Most students enrolled at Peachtown live within 20 miles of Aurora. Current students are from the Southern Cayuga, Union Springs, Auburn, Moravia, Lansing and Ithaca school districts.  
+From all walks of life and of all abilities, from different ethnic, religious, and socio-economic backgrounds, Peachtown students form one cohesive community. Most students enrolled at Peachtown live within 20 miles of Aurora. Current students are from the Southern Cayuga, Union Springs, Auburn, Moravia, Homer, Lansing and Ithaca school districts.  
   
 ## Admission
   
@@ -31,7 +33,7 @@ Scholarships are available for families demonstrating financial need. Families r
   
 ## Schedule
   
-In 2008, Peachtown moved to a four-day school week. Classes run from 8:45-4:15, Monday - Thursday; a brief afterschool care is offered until 4:30 daily.    
+In 2008, Peachtown moved to a four-day school week. Classes run from 8:45-4:15, Monday - Thursday; a brief afterschool care is offered until 5:00 daily.    
   
 You can find our [school calendar here](/calendar/).  
   
