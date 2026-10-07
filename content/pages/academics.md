@@ -1,10 +1,12 @@
 ---
-title: "Academics"
-description: "The Peachtown curriculum: multi-age classrooms, interdisciplinary Main Lesson study, world languages, and no standardised testing."
-navGroup: "main"
+title: Academics
+isLink: true
+description: "The Peachtown curriculum: multi-age classrooms, interdisciplinary
+  Main Lesson study, world languages, and no standardised testing."
+navGroup: main
 order: 20
 draft: false
-legacyUrl: "http://www.peachtownschool.com/p/academics.html"
+legacyUrl: http://www.peachtownschool.com/p/academics.html
 ---
 
 ## Peachtown's Curriculum
@@ -53,17 +55,13 @@ Peachtown is a model of resourcefulness.  Whenever possible, materials and equip
 
 ## A Typical Day at Peachtown
 Monday-Thursday  
-  
-
-### Morning
-- **8:45** All-School Morning Meeting
-- **9:05** Main Lesson
+ 
+-  **8:45** All-School Morning Meeting
+- **9:00** Main Lesson
 - **10:15** Snack/ Language Arts
-- **11:25** Math
-
-12:00 Swimming or [Physical Education](/physical-education/) in Wells Athletic Center
-
-- **1:00** Lunch and Recess
-- **2:30** Spanish, French, Art, or Music
-- **3:30** Choice Activity
+- **11:30** Math
+- **12:45** Lunch/Chores/Recess
+- **1:45**  Quiet reading time
+- **2:30** Spanish, Art, or Music
+- **3:30** Physical education
 - **4:15** After School Care
